@@ -30,7 +30,7 @@ async function getCoordinatesByCityName(cityName) {
 
 async function getWeatherDataByCityLocation(lat, lon) {
   let res = await fetch(
-    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIKey}`
+    `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${APIKey}`
   );
 
   let information = await res.json();
@@ -73,6 +73,20 @@ async function addCity() {
   }
 }
 
+function removeCity(event) {
+  let city = cities.find((x) => x.name == event.target.offsetParent.id);
+
+  let index = cities.indexOf(city);
+
+  if (index > -1) {
+    cities.splice(index, 1);
+  }
+
+  localStorage.setItem("cities", JSON.stringify(cities));
+
+  document.getElementById(event.target.offsetParent.id).remove();
+}
+
 async function createNewCityElement(container, { name, lat, lon }) {
   let cityWeatherEl = document.createElement("div");
   cityWeatherEl.className = "weatherInfo";
@@ -80,12 +94,21 @@ async function createNewCityElement(container, { name, lat, lon }) {
   container.append(cityWeatherEl);
   let cityWeather = await getWeatherDataByCityLocation(lat, lon);
 
-  console.log(JSON.stringify(cityWeather));
+  cityWeatherEl.setAttribute("id", name);
 
   let cityHeaderEl = document.createElement("h3");
   cityHeaderEl.innerText = name;
 
   cityWeatherEl.append(cityHeaderEl);
+
+  let weatherImg = document.createElement("img");
+  weatherImg.setAttribute(
+    "src",
+    `http://openweathermap.org/img/wn/${cityWeather.weather[0].icon}@2x.png`
+  );
+  weatherImg.setAttribute("alt", "weather icon");
+
+  cityWeatherEl.append(weatherImg);
 
   let weatherMainEl = document.createElement("h4");
   weatherMainEl.className = "weatherMain";
@@ -100,12 +123,12 @@ async function createNewCityElement(container, { name, lat, lon }) {
 
   let temperatureEl = document.createElement("h4");
   temperatureEl.className = "temperature";
-  temperatureEl.innerText = `Temperature: ${cityWeather.main.temp}`;
+  temperatureEl.innerText = `Temperature: ${cityWeather.main.temp} deg C`;
 
   cityWeatherEl.append(temperatureEl);
 
   let temperatureFeelsEl = document.createElement("p");
-  temperatureFeelsEl.innerText = `Feels like: ${cityWeather.main.feels_like}`;
+  temperatureFeelsEl.innerText = `Feels like: ${cityWeather.main.feels_like} deg C`;
 
   cityWeatherEl.append(temperatureFeelsEl);
 
@@ -114,6 +137,13 @@ async function createNewCityElement(container, { name, lat, lon }) {
   windEl.innerText = `Wind: ${cityWeather.wind.speed} m/s`;
 
   cityWeatherEl.append(windEl);
+
+  let removeBtn = document.createElement("button");
+  removeBtn.className = "removeBtn";
+  removeBtn.innerText = "Remove city";
+  removeBtn.addEventListener("click", removeCity);
+
+  cityWeatherEl.append(removeBtn);
 
   return cityWeatherEl;
 }

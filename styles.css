@@ -36,19 +36,15 @@ body {
   padding-left: 5px;
 }
 
-button {
+.addForm button {
   font-size: 1rem;
   margin: 0 10px;
   padding: 0 10px;
   border-radius: 4px;
 }
 
-button:hover {
+.addForm button:hover {
   background-color: rgb(193, 193, 193);
-}
-
-button:active {
-  transform: scale(0.95);
 }
 
 #results {
@@ -77,4 +73,25 @@ button:active {
 .wind {
   margin-top: 3px;
   border-top: var(--main-border);
+}
+
+.removeBtn {
+  background-color: red;
+  color: white;
+  padding: 5px;
+  margin-top: 10px;
+  border-radius: 5px;
+}
+
+.removeBtn:hover {
+  background-color: rgb(250, 93, 93);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+img {
+  background-color: #467988;
+  border-radius: 50%;
 }
