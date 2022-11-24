@@ -1,6 +1,5 @@
 :root {
   --main-bg-color: rgba(255, 255, 255, 30%);
-  --main-border: 1px solid #2d2d2d;
 }
 
 * {
@@ -19,6 +18,7 @@ body {
 
 .addForm {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-start;
   padding: 10px;
   background: var(--main-bg-color);
@@ -47,6 +47,17 @@ body {
   background-color: rgb(193, 193, 193);
 }
 
+.errorCityField {
+  border-color: red;
+}
+
+.errorField {
+  font-size: 1.3rem;
+  color: red;
+  width: 100%;
+  padding: 10px 0px 0px 250px;
+}
+
 #results {
   display: flex;
   flex-wrap: wrap;
@@ -64,8 +75,18 @@ body {
   margin: 10px 40px;
   padding: 5px 10px;
   border: var(--main-border);
+  --main-border: 1px solid #2d2d2d;
   border-radius: 5px;
   background-color: var(--main-bg-color);
+}
+
+.currentLocation {
+  --main-border: 1px solid #be9f5a;
+  background-color: rgba(167, 154, 45, 0.3);
+}
+
+.currentLocation h2::after {
+  content: " (current)";
 }
 
 .weatherMain,
@@ -78,6 +99,7 @@ body {
 .removeBtn {
   background-color: red;
   color: white;
+  font-size: 1rem;
   padding: 5px;
   margin-top: 10px;
   border-radius: 5px;

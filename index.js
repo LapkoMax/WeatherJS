@@ -1,6 +1,7 @@
 const APIKey = "b1f81cbdc552ee9c9d86fcabf9b48999";
 
 let cities = JSON.parse(localStorage.getItem("cities"));
+let current = undefined;
 
 document.addEventListener("DOMContentLoaded", initialize);
 
@@ -10,6 +11,24 @@ async function initialize() {
   }
 
   cities.sort((a, b) => a.name.localeCompare(b.name));
+
+  await navigator.geolocation.getCurrentPosition(
+    async (position) => {
+      let container = document.getElementById("results");
+
+      current = await createNewCityElement(
+        container,
+        {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        },
+        true
+      );
+    },
+    (error) => {
+      console.log(error);
+    }
+  );
 
   if (cities.length > 0) {
     let container = document.getElementById("results");
@@ -40,6 +59,10 @@ async function getWeatherDataByCityLocation(lat, lon) {
 
 async function addCity() {
   let cityField = document.getElementById("cityName");
+  let errorField = document.getElementById("errorField");
+
+  cityField.classList.remove("errorCityField");
+  errorField.innerText = "";
 
   let cityName = cityField.value;
 
@@ -48,12 +71,22 @@ async function addCity() {
 
     let cityInformation = await getCoordinatesByCityName(cityName);
 
-    let newCityName = cityInformation.local_names.en;
+    console.log(cityInformation);
 
     if (
-      newCityName &&
-      (cities.lenght === 0 || !cities.find((x) => x.name == newCityName))
+      cityInformation == undefined ||
+      cityInformation.local_names == undefined ||
+      cityInformation.local_names.en == undefined
     ) {
+      cityField.classList.add("errorCityField");
+      errorField.innerText =
+        "Sorry, we can't find a city you specified. Try again.";
+      return;
+    }
+
+    let newCityName = cityInformation.local_names.en;
+
+    if (cities.lenght === 0 || !cities.find((x) => x.name == newCityName)) {
       let newCity = {
         name: newCityName,
         lat: cityInformation.lat,
@@ -68,8 +101,9 @@ async function addCity() {
 
       await createNewCityElement(container, newCity);
     }
-
-    console.log(cities);
+  } else {
+    cityField.classList.add("errorCityField");
+    errorField.innerText = "You havent specified any city name. Try again.";
   }
 }
 
@@ -87,17 +121,29 @@ function removeCity(event) {
   document.getElementById(event.target.offsetParent.id).remove();
 }
 
-async function createNewCityElement(container, { name, lat, lon }) {
+async function createNewCityElement(
+  container,
+  { name, lat, lon },
+  isCurrLocation = false
+) {
   let cityWeatherEl = document.createElement("div");
-  cityWeatherEl.className = "weatherInfo";
+  cityWeatherEl.className = `weatherInfo${
+    isCurrLocation ? " currentLocation" : ""
+  }`;
 
-  container.append(cityWeatherEl);
+  cityWeatherEl.style.display = "none";
+
+  if (isCurrLocation) {
+    container.insertBefore(cityWeatherEl, container.firstChild);
+  } else {
+    container.append(cityWeatherEl);
+  }
   let cityWeather = await getWeatherDataByCityLocation(lat, lon);
 
-  cityWeatherEl.setAttribute("id", name);
+  cityWeatherEl.setAttribute("id", name != undefined ? name : cityWeather.name);
 
-  let cityHeaderEl = document.createElement("h3");
-  cityHeaderEl.innerText = name;
+  let cityHeaderEl = document.createElement("h2");
+  cityHeaderEl.innerText = name != undefined ? name : cityWeather.name;
 
   cityWeatherEl.append(cityHeaderEl);
 
@@ -144,6 +190,8 @@ async function createNewCityElement(container, { name, lat, lon }) {
   removeBtn.addEventListener("click", removeCity);
 
   cityWeatherEl.append(removeBtn);
+
+  cityWeatherEl.style.display = "block";
 
   return cityWeatherEl;
 }
