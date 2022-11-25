@@ -12,6 +12,7 @@ body {
   background-image: url("https://c0.wallpaperflare.com/preview/416/337/233/weather-news-reporter-man.jpg");
   background-repeat: no-repeat;
   background-size: cover;
+  background-attachment: fixed;
   margin: 10px;
   padding: 10px;
 }
