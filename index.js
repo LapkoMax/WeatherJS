@@ -10,7 +10,7 @@ async function initialize() {
 
   cities.sort((a, b) => a.name.localeCompare(b.name));
 
-  if (cities.find((x) => x.isCurrent == true) == undefined) {
+  if (cities.find((x) => x.isCurrent === true) === undefined) {
     await navigator.geolocation.getCurrentPosition(
       async (position) => {
         await createNewCityElement(container, {
@@ -48,9 +48,9 @@ async function addCity() {
     let cityInformation = await getCoordinatesByCityName(cityName);
 
     if (
-      cityInformation == undefined ||
-      cityInformation.local_names == undefined ||
-      cityInformation.local_names.en == undefined
+      cityInformation === undefined ||
+      cityInformation.local_names === undefined ||
+      cityInformation.local_names.en === undefined
     ) {
       cityField.classList.add("errorCityField");
       errorField.innerText =
@@ -60,14 +60,16 @@ async function addCity() {
 
     let newCityName = cityInformation.local_names.en;
 
-    if (cities.lenght === 0 || !cities.find((x) => x.name == newCityName)) {
-      let newCity = {
-        name: newCityName,
-        lat: cityInformation.lat,
-        lon: cityInformation.lon,
-      };
-      await createNewCityElement(container, newCity);
+    if (cities?.find((x) => x.name === newCityName)) {
+      return;
     }
+
+    let newCity = {
+      name: newCityName,
+      lat: cityInformation.lat,
+      lon: cityInformation.lon,
+    };
+    await createNewCityElement(container, newCity);
   } else {
     cityField.classList.add("errorCityField");
     errorField.innerText = "You havent specified any city name. Try again.";

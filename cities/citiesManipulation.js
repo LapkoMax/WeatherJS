@@ -1,30 +1,27 @@
 import { getWeatherDataByCityLocation } from "../api/openWeatherAPI.js";
 
-let cities = JSON.parse(localStorage.getItem("cities"));
-
-if (cities == undefined) {
-  cities = [];
-}
+let cities = JSON.parse(localStorage.getItem("cities")) ?? [];
 
 function addCity(newCity) {
-  if (cities.find((x) => x.name == newCity.name) == undefined) {
-    cities.push(newCity);
-
-    localStorage.setItem("cities", JSON.stringify(cities));
+  if (cities.find((x) => x.name === newCity.name) !== undefined) {
+    return;
   }
+
+  cities.push(newCity);
+  localStorage.setItem("cities", JSON.stringify(cities));
 }
 
 function removeCity(event) {
-  let city = cities.find((x) => x.name == event.target.offsetParent.id);
+  let city = cities.find((x) => x.name === event.target.offsetParent.id);
 
   let index = cities.indexOf(city);
 
-  if (index > -1) {
-    cities.splice(index, 1);
+  if (index <= -1) {
+    return;
   }
 
+  cities.splice(index, 1);
   localStorage.setItem("cities", JSON.stringify(cities));
-
   document.getElementById(event.target.offsetParent.id).remove();
 }
 
